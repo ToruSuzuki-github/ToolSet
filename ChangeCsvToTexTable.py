@@ -4,23 +4,10 @@ import csv
 from glob import glob
 
 def changeCsv(inputFilePath,outputFilePath):
-    '''
-    try:
-        if not os.path.isfile(inputFilePath):
-            stdout.write('\n読み込みファイルが存在しません')
-            return False
-        elif os.path.isdir(inputFilePath):
-            stdout.write('\n読み込みファイルが存在しません')
-            return False
-    except FileNotFoundError:
-        stdout.write('\n読み込みファイルが存在しません')
-        return False
-    outputFilePath='./'+os.path.splitext(os.path.basename(inputFilePath))[0]+'.tex.txt'
-    '''
     if os.path.isfile(outputFilePath):
         while True:
             stdout.write('\n出力ファイル名と同じファイルが既に存在します。')
-            stdout.write('\n出力予定ファイルのファイルパス:\n'+os.path.splitext(str(os.getcwd()))[0]+'/'+os.path.basename(outputFilePath))
+            stdout.write('\n出力予定ファイルのファイルパス:\n'+str(outputFilePath))
             stdout.write('\n上書きして大丈夫な場合『Yes』、処理を辞める場合『No』を入力してください。')
             stdout.flush()
             try:
@@ -57,6 +44,10 @@ def changeCsv(inputFilePath,outputFilePath):
     with open(inputFilePath,'r') as rf:
         fileDataList=csv.reader(rf)
         with open(outputFilePath,'w') as wf:
+            #wf.write("\n\\begin{{table}}[t] %表の位置を指定")
+		    #wf.write("\n\\%\\centering")
+		    #wf.write("\n\\hspace{{-1.5cm}}")
+    		#wf.write("\n\\begin{{tabular}}{{}}} %カラムのデータ位置の設定")
             for row in fileDataList:
                 for num,element in enumerate(row,start=1):
                     wf.write(element)
@@ -68,48 +59,55 @@ def changeCsv(inputFilePath,outputFilePath):
     stdout.write('\n出力ファイルのファイルパス:\n'+os.path.splitext(str(os.getcwd()))[0]+'/'+os.path.basename(outputFilePath))
     stdout.flush()
     return True
-
-runFlag=False
-helpFlag=False
-args=argv
-if 'help' in args:
-    stdout.write('\n【本プログラムの処理内容】')
-    stdout.write('\n指定したcsvファイルをtexファイルで表を表示するための表記に変更するプログラム。\n結果ファイルの出力先は本プログラムを実行した際のカレントディレクトリ。\n出力ファイルの形式は.txtファイル')
-    stdout.write('\n\n【本プログラムのコマンドライン引数】')
-    for num,element in enumerate(['対象ファイルのファイルパス若しくは対象ファイルがまとめられているディレクトリのディレクトリパス'],start=1):
-        stdout.write('\n第'+str(num)+'引数: '+str(element))
-    helpFlag=True
-    result=True
-elif len(args)==2:
-    inputFilePath=args[1]
-    try:
-        if os.path.isfile(inputFilePath):
-            inputFilePathList=[inputFilePath]
-            runFlag=True
-        elif os.path.isdir(inputFilePath):
-            inputFilePathList=sorted(glob(inputFilePath+'/*.csv'))
-            runFlag=True
+if __name__=="__main__":
+    runFlag=False
+    helpFlag=False
+    args=argv
+    argument_list=["変換元ファイル/ディレクトリパス","変換後ファイル出力先ディレクトリパス"]
+    if ('-h' in args) or ('-help' in args):
+        stdout.write('\n【本プログラムの処理内容】')
+        stdout.write('\n指定したcsvファイルをtexファイルで表を表示するための表記に変更するプログラム。\n出力ファイルの形式は.txtファイル')
+        stdout.write('\n\n【本プログラムの実行形式】')
+        stdout.write("\nPython3 "+str(args[0]))
+        for argument in argument_list:
+            stdout.write(" <"+str(argument)+">")
+        helpFlag=True
+        result=True
+    elif len(args)==(len(argument_list)+1):
+        inputFilePath=args[1]
+        outputDirPath=args[2]
+        if os.path.dirname(outputDirPath):
+            try:
+                if os.path.isfile(inputFilePath):
+                    inputFilePathList=[inputFilePath]
+                    runFlag=True
+                elif os.path.isdir(inputFilePath):
+                    inputFilePathList=sorted(glob(inputFilePath+'/*.csv'))
+                    runFlag=True
+                else:
+                    stdout.write('\n変換元ファイルが存在しません')
+                    result=False
+            except FileNotFoundError:
+                stdout.write('\n変換元ファイルが存在しません')
+                result=False
         else:
-            stdout.write('\n読み込みファイルが存在しません')
+            stdout.write("出力先ディレクトリが存在しません")
             result=False
-    except FileNotFoundError:
-        stdout.write('\n読み込みファイルが存在しません')
+    else:
         result=False
-else:
-    result=False
-    stdout.write('\n引数の数が不正')
-if runFlag:
-    for inputFilePath in inputFilePathList:
-        stdout.write('\n'+os.path.basename(inputFilePath)+' 処理開始')
-        stdout.flush()
-        outputFilePath='./ChangeCsvToTexTable/'+os.path.splitext(os.path.basename(inputFilePath))[0]+'.tex.txt'
-        os.makedirs(os.path.dirname(outputFilePath),exist_ok=True)
-        result=changeCsv(inputFilePath,outputFilePath)
-        stdout.write('\n'+os.path.basename(inputFilePath)+' 処理終了')
-        stdout.flush()
-if result or helpFlag:
-    stdout.write('\n正常終了')
-else:
-    stdout.write('\n異常終了')
-stdout.write('\n')
-stdout.flush()
+        stdout.write('\n引数の数が不正')
+    if runFlag:
+        for inputFilePath in inputFilePathList:
+            stdout.write('\n'+os.path.basename(inputFilePath)+' 処理開始')
+            stdout.flush()
+            outputFilePath=outputDirPath+"/"+os.path.splitext(os.path.basename(inputFilePath))[0]+'.tex.txt'
+            os.makedirs(os.path.dirname(outputFilePath),exist_ok=True)
+            result=changeCsv(inputFilePath,outputFilePath)
+            stdout.write('\n'+os.path.basename(inputFilePath)+' 処理終了')
+            stdout.flush()
+    if result or helpFlag:
+        stdout.write('\n正常終了')
+    else:
+        stdout.write('\n異常終了')
+    stdout.write('\n')
+    stdout.flush()
