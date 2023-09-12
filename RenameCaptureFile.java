@@ -76,7 +76,7 @@ public class RenameCaptureFile{
                         System.out.println("重複ファイル："+new_file_path);
                     } else {
                         file_path.renameTo(new_file_path);
-                        //new_file_path_list.add(new_file_path);
+                        new_file_path_list.add(new_file_path);
                     }
                 }
                 // ファイル名の修正を行わなかったとき出力
