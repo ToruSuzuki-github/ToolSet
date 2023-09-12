@@ -31,6 +31,7 @@ public class RenameCaptureFile{
         else{
             //---------------共通パラメーター---------------
             ArrayList<File> new_file_path_list = new ArrayList<>(); //修正後の新しいファイルパス一覧
+            boolean not_change_name_flg=true; //ファイル修正を実施したかのフラグ
             
             //---------------ファイル名の修正---------------
             System.out.println("ファイル名の修正開始");
@@ -49,10 +50,14 @@ public class RenameCaptureFile{
                 
                 //パス毎に処理（修正後ファイル名の作成、ファイル名の修正）
                 for (File file_path: file_path_list){
+                    
                     //パスがファイル以外の時スキップ
                     if(!(dir_path.isFile())){
                         continue;
                     }
+
+                    //パス修正を行ったことを保存
+                    not_change_name_flg=false;
 
                     // 修正後ファイル名を作成
                     split_file_name=file_path.getName().split(" ");
@@ -71,8 +76,12 @@ public class RenameCaptureFile{
                         System.out.println("重複ファイル："+new_file_path);
                     } else {
                         file_path.renameTo(new_file_path);
-                        new_file_path_list.add(new_file_path);
+                        //new_file_path_list.add(new_file_path);
                     }
+                }
+                // ファイル名の修正を行わなかったとき出力
+                if(not_change_name_flg){
+                    System.out.println("指定ディレクトリ内に修正対象のファイルが存在しません");
                 }
             }else{
                 System.out.println("ディレクトリではありません");
@@ -81,28 +90,34 @@ public class RenameCaptureFile{
 
             //---------------フォルダの作成とファイルの移動（オプション -s）---------------
             if(ops_par.containsKey("-s")){
+                System.out.print("\n");
                 System.out.println("フォルダの作成とファイルの移動開始");
-                //パラメーター
-                Path folder_path = Paths.get(args[0]+"/"+ops_par.get("-s")); //作成フォルダーのパス
-                
-                //フォルダーの存在チェック
-                if(folder_path.toFile().exists()){
-                    System.out.println("フォルダ名が既に利用されているためフォルダの作成及びファイルの移動ができません");
-                    System.out.println("作成失敗フォルダ："+folder_path);
+                // ファイル名の修正を行わなかったときにフォルダの作成も行わない
+                if(not_change_name_flg){
+                    System.out.println("指定ディレクトリ内に修正対象のファイルが存在しないためフォルダを作成しません");
                 }else{
-                    //フォルダーの作成
-                    try{
-                        Files.createDirectory(folder_path);
-                    }catch(IOException e){
-                        System.out.println(e);
-                    }
-                    //ファイルをフォルダーへ移動
-                    for(File before_move: new_file_path_list){
-                        Path after_move = Paths.get(folder_path.toString()+"/"+before_move.getName().toString());
+                    //パラメーター
+                    Path folder_path = Paths.get(args[0]+"/"+ops_par.get("-s")); //作成フォルダーのパス
+                    
+                    //フォルダーの存在チェック
+                    if(folder_path.toFile().exists()){
+                        System.out.println("フォルダ名が既に利用されているためフォルダの作成及びファイルの移動ができません");
+                        System.out.println("作成失敗フォルダ："+folder_path);
+                    }else{
+                        //フォルダーの作成
                         try{
-                            Files.move(before_move.toPath(), after_move);
+                            Files.createDirectory(folder_path);
                         }catch(IOException e){
                             System.out.println(e);
+                        }
+                        //ファイルをフォルダーへ移動
+                        for(File before_move: new_file_path_list){
+                            Path after_move = Paths.get(folder_path.toString()+"/"+before_move.getName().toString());
+                            try{
+                                Files.move(before_move.toPath(), after_move);
+                            }catch(IOException e){
+                                System.out.println(e);
+                            }
                         }
                     }
                 }
