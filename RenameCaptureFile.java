@@ -43,12 +43,16 @@ public class RenameCaptureFile{
             if(dir_path.isDirectory()){
 
                 // パラメーター設定
-                File file_path_list[] = dir_path.listFiles(); //修正対象のファイルパス一覧
+                File file_path_list[] = dir_path.listFiles(); //修正対象ディレクトリが含むパスの一覧
                 String[] split_file_name; //split後の修正ファイル名
                 File new_file_path; //修正後の新しいファイルパス
                 
-                //ファイル毎に処理（修正後ファイル名の作成、ファイル名の修正）
+                //パス毎に処理（修正後ファイル名の作成、ファイル名の修正）
                 for (File file_path: file_path_list){
+                    //パスがファイル以外の時スキップ
+                    if(!(dir_path.isFile())){
+                        continue;
+                    }
 
                     // 修正後ファイル名を作成
                     split_file_name=file_path.getName().split(" ");
