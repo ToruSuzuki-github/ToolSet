@@ -50,33 +50,43 @@ public class RenameCaptureFile{
                 
                 //パス毎に処理（修正後ファイル名の作成、ファイル名の修正）
                 for (File file_path: file_path_list){
+                    System.out.print(file_path.toString());
                     
                     //パスがファイル以外の時スキップ
-                    if(!(dir_path.isFile())){
+                    if(!(file_path.isFile())){
+                        System.out.println(" error ) It's not a file.");
                         continue;
                     }
 
-                    //パス修正を行ったことを保存
-                    not_change_name_flg=false;
+                    //パスが.png以外の時スキップ
+                    String file_name=file_path.getName();
+                    if(!(file_name.substring(file_name.lastIndexOf(".")).equals(".png"))){
+                        System.out.println(" error ) Not a capture file.");
+                        continue;
+                    }
 
                     // 修正後ファイル名を作成
-                    split_file_name=file_path.getName().split(" ");
+                    split_file_name=file_name.split(" ");
                     if(split_file_name.length>=3){
                         File tmp=new File(args[0]+"/"+split_file_name[split_file_name.length-2]+" "+split_file_name[split_file_name.length-1]);
                         new_file_path=tmp;
                     }
                     else{
+                        System.out.println(" error ) Failure to make of the new file name.");
                         continue;
                     }
                     
                     // ファイル名の修正
                     if (new_file_path.exists()) {
+                        System.out.println(" error ) Duplicate new file name.");
                         System.out.println("修正後ファイル名が既に利用されているためファイル名を修正できません");
                         System.out.println("修正失敗ファイル："+file_path);
                         System.out.println("重複ファイル："+new_file_path);
                     } else {
                         file_path.renameTo(new_file_path);
                         new_file_path_list.add(new_file_path);
+                        not_change_name_flg=false;
+                        System.out.println(" changes to \""+new_file_path.toString()+"\".");
                     }
                 }
                 // ファイル名の修正を行わなかったとき出力
