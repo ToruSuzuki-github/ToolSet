@@ -1,3 +1,5 @@
 *.class
 Captures
 *.old.*
+*.csv
+*.tex
