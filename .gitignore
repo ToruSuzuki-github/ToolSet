@@ -1,3 +1,9 @@
+# GoogleDriveDesktopのtmpフォルダ
+/.tmp.driveupload/
+/_tmp.driveupload/
+/.tmp.drivedownload/
+/_tmp.drivedownload/
+# 
 *.class
 Captures
 *.old.*
