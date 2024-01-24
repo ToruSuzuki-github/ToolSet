@@ -16,12 +16,14 @@ public class RenameCaptureFile{
     public static Map<String, String> option_clearing(String[] args){
         Map<String, String> ops_par = new HashMap<>();
         int index_of;
-        if(Arrays.asList(args).contains("-h") || Arrays.asList(args).contains("-help")){
-            ops_par.put("-h","");
+        //if(Arrays.asList(args).contains("-h") || Arrays.asList(args).contains("--help")){
+        if(Arrays.asList(args).contains("--help")){
+            ops_par.put("--help","");
         }
-        if(Arrays.asList(args).contains("-s")){
-            index_of=Arrays.asList(args).indexOf("-s");
-            ops_par.put("-s",args[index_of+1]);
+        //if(Arrays.asList(args).contains("-s")){
+        if(Arrays.asList(args).contains("--organize")){
+            index_of=Arrays.asList(args).indexOf("--organize");
+            ops_par.put("--organize",args[index_of+1]);
         }
         return ops_par;
     }
@@ -29,7 +31,8 @@ public class RenameCaptureFile{
     public static void std_help(){
         System.out.println("実行形式\njava RenameCaptureFile <rename対象ファイルが属するフォルダのパス> <オプション>");
         System.out.println("オプション");
-        System.out.println("-s <フォルダー名> : 修正後のファイルをフォルダーにまとめる");
+        System.out.println("--organize <フォルダー名> : 修正後のファイルをフォルダーにまとめる");
+        System.out.println("--help : ヘルプを標準出力");
     }
     // 第1引数をディレクトリパスに変換
     public static File make_dir_path(String origin_str){
@@ -133,10 +136,10 @@ public class RenameCaptureFile{
         //オプションの整理
         ops_par=option_clearing(args);
         
-        //オプションで-h指定の時help表示
-        if(ops_par.containsKey("-h")){
+        //オプションで"--help"指定の時help表示
+        if(ops_par.containsKey("--help")){
             std_help();
-            return false;
+            return true;
         }
 
         // ディレクトリパスの作成とチェック
@@ -155,9 +158,9 @@ public class RenameCaptureFile{
 
         //----------------オプション機能----------------
         // フォルダー作成&ファイル移動
-        if(ops_par.containsKey("-s")){
+        if(ops_par.containsKey("--organize")){
             // フォルダーパスの作成
-            Path folder_path = Paths.get(dir_path.toString()+"/"+ops_par.get("-s")); //作成フォルダーのパス
+            Path folder_path = Paths.get(dir_path.toString()+"/"+ops_par.get("--organize")); //作成フォルダーのパス
             // フォルダー作成&ファイル移動
             if(!(make_folder_move_file(folder_path, new_file_path_arraylist))){
                 return false;
@@ -174,6 +177,7 @@ public class RenameCaptureFile{
         }
         else{
             System.out.println("Program Failure");
+            System.out.println("Try \"java RenameCaptureFile --help\" for more information.");
         }
     }
 }
