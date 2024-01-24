@@ -1,0 +1,2 @@
+# RenameCaptureFile
+用途：アクティブウィンドウキャプチャ画像の整理
